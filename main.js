@@ -22,14 +22,46 @@
  */
 
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, $, brackets, btoa, atob */
+/*global define, $, brackets */
 
 define(function (require, exports, module) {
     'use strict';
-    //handlebars
-    //text.js
+
+    
+    var EditorManager = brackets.getModule("editor/EditorManager");
+
     var Showdown = require("Showdown");
-    var text = "Markdown *rocks*.";
-    console.log(Showdown);
-    console.log(Showdown.makeHtml(text));
+    var Handlebars = require("Handlebars");
+    
+    var menuSource = require("text!menu.template");
+    var menuTemplate = Handlebars.compile(menuSource);
+    
+    var menu = $(menuTemplate());
+    
+    $("#menu-edit-duplicate").parent().before(menu);
+    
+    menu.click(function () {
+        var content = EditorManager.getFocusedEditor()._codeMirror.getValue();
+        content = Showdown.makeHtml(content);
+        $("#brackets-markdown-extension-preview-div").html(content);
+    });
+    
+    var previewSource = require("text!preview.template");
+
+    var previewTemplate = Handlebars.compile(previewSource);
+    
+    var previewContext = {
+        rootPath : module.uri.replace("main.js", "")
+    };
+    
+    var preview = $(previewTemplate(previewContext));
+    $("body").prepend(preview);
+    
+    //$("#brackets-markdown-extension-preview-iframe").attr("src", module.uri);
+
+    //Showdown.makeHtml(text);
+    
+    
+    
+    
 });
